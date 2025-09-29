@@ -1,4 +1,4 @@
-record Step2(
+record Step(
     string Action,
     string? Window,
     string? ControlType,
