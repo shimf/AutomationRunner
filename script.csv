@@ -1,0 +1,12 @@
+Action,Window,ControlType,By,Selector,Value,TimeoutMs
+FocusWindow,,Window,Title,Legacy App - Orders,,5000
+WaitFor,Legacy App - Orders,Edit,AutomationId,txtOrderId,,8000
+SetText,Legacy App - Orders,Edit,AutomationId,txtOrderId,12345,
+Click,Legacy App - Orders,Button,Name,Search,,0
+WaitFor,Legacy App - Orders,DataGrid,Name,Orders Grid,,10000
+IfExists,Legacy App - Orders,Button,Name,OK,,2000
+Click,Legacy App - Orders,Button,Name,OK,,
+Menu,Legacy App - Orders,MenuItem,Path,File>Export CSV,,
+Sleep,,,,,,1500
+SendKeys,Legacy App - Orders,,Keys,Export_Complete,,
+Log,,,,Finished script successfully,,

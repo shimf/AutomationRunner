@@ -1,0 +1,18 @@
+Action,Window,ControlType,By,Selector,Value,TimeoutMs
+FocusWindow,,Window,Title,Calculator,,5000
+Click,Calculator,Button,Name,Two,,
+Click,Calculator,Button,Name,Plus,,
+Click,Calculator,Button,Name,Three,,
+Click,Calculator,Button,Name,Equals,,
+Log,,,,Performed 2 + 3,,
+Click,Calculator,Button,Name,Nine,,
+Click,Calculator,Button,Name,Minus,,
+Click,Calculator,Button,Name,Four,,
+Click,Calculator,Button,Name,Equals,,
+Log,,,,Performed 9 - 4,,
+Click,Calculator,Button,Name,Six,,
+Click,Calculator,Button,Name,Multiply by,,
+Click,Calculator,Button,Name,Seven,,
+Click,Calculator,Button,Name,Equals,,
+Log,,,,Performed 6 * 7,,
+SendKeys,Calculator,,Keys,%{F4},,
