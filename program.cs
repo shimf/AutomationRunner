@@ -134,70 +134,81 @@ class Program
         switch (s.Action?.Trim().ToLowerInvariant())
         {
             case "focuswindow":
-            {
-                var win = FindWindow(app, automation, s.Selector ?? s.Window, timeout);
-                win?.Focus();
-                break;
-            }
+                {
+                    var win = FindWindow(app, automation, s.Selector ?? s.Window, timeout);
+                    win?.Focus();
+                    break;
+                }
             case "waitfor":
-            {
-                FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
-                break;
-            }
+                {
+                    FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
+                    break;
+                }
             case "click":
-            {
-                var el = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
-                var button = el.AsButton();
-                if (button != null) button.Invoke();
-                else el.Click();
-                break;
-            }
+                {
+                    var el = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
+                    var button = el.AsButton();
+                    if (button != null) button.Invoke();
+                    else el.Click();
+                    break;
+                }
             case "settext":
-            {
-                var el = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
-                var edit = el.AsTextBox();
-                if (edit != null)
                 {
-                    edit.Focus();
-                    edit.Text = s.Value ?? string.Empty;
+                    var el = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
+                    var edit = el.AsTextBox();
+                    if (edit != null)
+                    {
+                        edit.Focus();
+                        edit.Text = s.Value ?? string.Empty;
+                    }
+                    else
+                    {
+                        // Fallback: focus + select all + type
+                        el.Focus();
+                        SelectAllAndType(s.Value ?? "");
+                    }
+                    break;
                 }
-                else
+            case "asserttext":
                 {
-                    // Fallback: focus + select all + type
-                    el.Focus();
-                    SelectAllAndType(s.Value ?? "");
+                    var el = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: true);
+                    var actual = el.Name ?? el.AsLabel()?.Text ?? el.AsTextBox()?.Text ?? "";
+                    if (!string.Equals(actual.Trim(), s.Value?.Trim(), StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new Exception($"Assertion failed: expected '{s.Value}', got '{actual}'");
+                    }
+                    logger.LogInformation("Assertion passed: {Selector} == {Value}", s.Selector, s.Value);
+                    break;
                 }
-                break;
-            }
             case "sendkeys":
-            {
-                var win = FindWindow(app, automation, s.Window, timeout);
-                win?.Focus();
-                SendKeySequence(s.Selector ?? s.Value ?? "");
-                break;
-            }
+                {
+                    var win = FindWindow(app, automation, s.Window, timeout);
+                    win?.Focus();
+                    SendKeySequence(s.Selector ?? s.Value ?? "");
+                    break;
+                }
             case "menu":
-            {
-                var win = FindWindow(app, automation, s.Window, timeout)
-                          ?? throw new Exception("Window not found for menu action");
-                InvokeMenuPath(win, s.Selector ?? s.Value ?? "");
-                break;
-            }
+                {
+                    var win = FindWindow(app, automation, s.Window, timeout)
+                              ?? throw new Exception("Window not found for menu action");
+                    InvokeMenuPath(win, s.Selector ?? s.Value ?? "");
+                    break;
+                }
             case "sleep":
-            {
-                Thread.Sleep(timeout);
-                break;
-            }
+                {
+                    Thread.Sleep(timeout);
+                    break;
+                }
             case "ifexists":
-            {
-                _ = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: false);
-                break;
-            }
+                {
+                    _ = FindElement(app, automation, s.Window, s.ControlType, s.By, s.Selector, timeout, required: false);
+                    break;
+                }
             case "log":
-            {
-                logger.LogInformation("LOG: {Message}", s.Value ?? s.Selector);
-                break;
-            }
+                {
+                    logger.LogInformation("LOG: {Message}", s.Value ?? s.Selector);
+                    break;
+                }
             default:
                 throw new NotSupportedException($"Unknown action '{s.Action}'");
         }
@@ -259,10 +270,10 @@ class Program
         switch (byKey)
         {
             case "automationid": pieces.Add(cf.ByAutomationId(sel)); break;
-            case "name":         pieces.Add(cf.ByName(sel)); break;
-            case "classname":    pieces.Add(cf.ByClassName(sel)); break;
-            case "title":        pieces.Add(cf.ByName(sel)); break;
-            // "path" and "keys" are handled in their specific actions
+            case "name": pieces.Add(cf.ByName(sel)); break;
+            case "classname": pieces.Add(cf.ByClassName(sel)); break;
+            case "title": pieces.Add(cf.ByName(sel)); break;
+                // "path" and "keys" are handled in their specific actions
         }
 
         if (pieces.Count == 0) return null;
